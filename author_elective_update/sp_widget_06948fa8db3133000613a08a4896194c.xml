@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="DELETE">
+        <category>custom</category>
+        <client_script><![CDATA[function($rootScope,$scope) {
+	/* widget controller */
+	var c = this;
+	// Use a position indicator to know which record to update
+	c.notePos = 0;
+
+	c.selectItem = function(idx) {  
+		// Set the position indicator to the index value passed in on select
+		c.notePos = idx;
+		var id = c.data.notes[idx].sys_id;
+		console.log('Note ID: ' + id);
+		$rootScope.noteID = id;
+		$rootScope.$emit('selectNote', id);
+	}
+	// Subscribe to event.  Set the new title and note values on the 
+	// c.data object
+	$rootScope.$on('updateTitle', function(event,data) { 
+		c.data.notes[c.notePos].title = data.title;
+		c.data.notes[c.notePos].note = data.note;
+	});
+
+	c.newNote = function() {
+		c.server.get({
+			action: 'newNote'
+		}).then(function(r) {
+			c.data.notes.unshift(r.data.newNote);
+			c.data.noteID = r.data.noteID;
+			$rootScope.noteID = c.data.noteID;
+			$rootScope.$emit('selectNote', c.data.noteID);
+		});
+	}
+
+	$rootScope.$on('deleteNote', function(event,data) {
+		c.data.notes.splice(c.notePos, 1);
+	});
+
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>h3.panel-title {
+  font-size:20px;
+  padding-top:5px;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>bk_notes_list</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>Notes List</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+
+	data.notes = [];
+	var noteGR = new GlideRecord('x_snc_createnotes_note');
+	noteGR.addQuery('user', gs.getUser().getID());
+	noteGR.orderByDesc('sys_created_on');
+	noteGR.query();
+	while (noteGR.next()) {
+		var noteObj = {};
+
+		$sp.getRecordDisplayValues(noteObj, noteGR, 'number,title,sys_id');
+
+		noteObj.note = noteGR.getValue('note').slice(0,20);
+
+		data.notes.push(noteObj);
+	}
+
+	if (input) {
+		if (input.action == 'newNote') {
+			var newNote = new GlideRecord('x_snc_createnotes_note');
+			newNote.newRecord();
+			var id = newNote.insert();
+			data.noteID = id;
+			data.newNote = {};
+			$sp.getRecordValues(data.newNote,newNote,"title,note,sys_id");
+
+		}
+	}
+}
+)();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-05-30 18:13:04</sys_created_on>
+        <sys_id>06948fa8db3133000613a08a4896194c</sys_id>
+        <sys_mod_count>11</sys_mod_count>
+        <sys_name>Notes List</sys_name>
+        <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
+        <sys_update_name>sp_widget_06948fa8db3133000613a08a4896194c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-11-29 13:39:30</sys_updated_on>
+        <template><![CDATA[<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h3 class="panel-title pull-left">
+      ${Notes}
+    </h3>
+    <button class="btn btn-default pull-right" ng-click="c.newNote()"> 
+      <span class="glyphicon glyphicon-plus"></span> 
+    </button>
+  </div>
+  <div class="panel-body"> 
+    <input placeholder="Filter" class="form-control" ng-model="noteFilter" /> 
+  </div>
+
+  <div class="list-group">
+    <a class="list-group-item" ng-click="c.selectItem($index)" ng-repeat="note in data.notes | filter: noteFilter">
+      <h4 class="list-group-item-heading">
+        {{note.title}}
+      </h4>
+      <p class="list-group-item-text">
+        {{note.note}}
+      </p>
+    </a>
+  </div>
+</div>]]></template>
+    </sp_widget>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</application>
+        <file_path/>
+        <instance_id>cd2e8836db150510ad8dd7c8f4961936</instance_id>
+        <instance_name>dev123262</instance_name>
+        <name>sp_widget_06948fa8db3133000613a08a4896194c</name>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sp_widget"&gt;&lt;sp_widget action="INSERT_OR_UPDATE"&gt;&lt;category&gt;custom&lt;/category&gt;&lt;client_script&gt;&lt;![CDATA[function($rootScope,$scope) {
+	/* widget controller */
+	var c = this;
+	// Use a position indicator to know which record to update
+	c.notePos = 0;
+
+	c.selectItem = function(idx) {  
+		// Set the position indicator to the index value passed in on select
+		c.notePos = idx;
+		var id = c.data.notes[idx].sys_id;
+		console.log('Note ID: ' + id);
+		$rootScope.noteID = id;
+		$rootScope.$emit('selectNote', id);
+	}
+	// Subscribe to event.  Set the new title and note values on the 
+	// c.data object
+	$rootScope.$on('updateTitle', function(event,data) { 
+		c.data.notes[c.notePos].title = data.title;
+		c.data.notes[c.notePos].note = data.note;
+	});
+
+	c.newNote = function() {
+		c.server.get({
+			action: 'newNote'
+		}).then(function(r) {
+			c.data.notes.unshift(r.data.newNote);
+			c.data.noteID = r.data.noteID;
+			$rootScope.noteID = c.data.noteID;
+			$rootScope.$emit('selectNote', c.data.noteID);
+		});
+	}
+
+	$rootScope.$on('deleteNote', function(event,data) {
+		c.data.notes.splice(c.notePos, 1);
+	});
+
+}
+]]&gt;&lt;/client_script&gt;&lt;controller_as&gt;c&lt;/controller_as&gt;&lt;css&gt;h3.panel-title {
+  font-size:20px;
+  padding-top:5px;
+}&lt;/css&gt;&lt;data_table&gt;sp_instance&lt;/data_table&gt;&lt;demo_data/&gt;&lt;description/&gt;&lt;docs/&gt;&lt;field_list/&gt;&lt;has_preview&gt;true&lt;/has_preview&gt;&lt;id&gt;bk_notes_list&lt;/id&gt;&lt;internal&gt;false&lt;/internal&gt;&lt;link&gt;&lt;![CDATA[function link(scope, element, attrs, controller) {  }]]&gt;&lt;/link&gt;&lt;name&gt;Notes List&lt;/name&gt;&lt;option_schema/&gt;&lt;public&gt;false&lt;/public&gt;&lt;roles/&gt;&lt;script&gt;&lt;![CDATA[(function() {
+
+	data.notes = [];
+	var noteGR = new GlideRecord('x_snc_createnotes_note');
+	noteGR.addQuery('user', gs.getUser().getID());
+	noteGR.orderByDesc('sys_created_on');
+	noteGR.query();
+	while (noteGR.next()) {
+		var noteObj = {};
+
+		$sp.getRecordDisplayValues(noteObj, noteGR, 'number,title,sys_id');
+
+		noteObj.note = noteGR.getValue('note').slice(0,20);
+
+		data.notes.push(noteObj);
+	}
+
+	if (input) {
+		if (input.action == 'newNote') {
+			var newNote = new GlideRecord('x_snc_createnotes_note');
+			newNote.newRecord();
+			var id = newNote.insert();
+			data.noteID = id;
+			data.newNote = {};
+			$sp.getRecordValues(data.newNote,newNote,"title,note,sys_id");
+
+		}
+	}
+}
+)();]]&gt;&lt;/script&gt;&lt;servicenow&gt;false&lt;/servicenow&gt;&lt;sys_class_name&gt;sp_widget&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2019-05-30 18:13:04&lt;/sys_created_on&gt;&lt;sys_id&gt;06948fa8db3133000613a08a4896194c&lt;/sys_id&gt;&lt;sys_mod_count&gt;11&lt;/sys_mod_count&gt;&lt;sys_name&gt;Notes List&lt;/sys_name&gt;&lt;sys_package display_value="CreateNotes" source="x_snc_createnotes"&gt;df5fd9a5090232007f44e1046c8ff69f&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="CreateNotes"&gt;df5fd9a5090232007f44e1046c8ff69f&lt;/sys_scope&gt;&lt;sys_update_name&gt;sp_widget_06948fa8db3133000613a08a4896194c&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2022-11-29 13:39:30&lt;/sys_updated_on&gt;&lt;template&gt;&lt;![CDATA[&lt;div class="panel panel-default"&gt;
+  &lt;div class="panel-heading clearfix"&gt;
+    &lt;h3 class="panel-title pull-left"&gt;
+      ${Notes}
+    &lt;/h3&gt;
+    &lt;button class="btn btn-default pull-right" ng-click="c.newNote()"&gt; 
+      &lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt; 
+    &lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="panel-body"&gt; 
+    &lt;input placeholder="Filter" class="form-control" ng-model="noteFilter" /&gt; 
+  &lt;/div&gt;
+
+  &lt;div class="list-group"&gt;
+    &lt;a class="list-group-item" ng-click="c.selectItem($index)" ng-repeat="note in data.notes | filter: noteFilter"&gt;
+      &lt;h4 class="list-group-item-heading"&gt;
+        {{note.title}}
+      &lt;/h4&gt;
+      &lt;p class="list-group-item-text"&gt;
+        {{note.note}}
+      &lt;/p&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;]]&gt;&lt;/template&gt;&lt;/sp_widget&gt;&lt;/record_update&gt;</payload>
+        <payload_hash>-1175064252</payload_hash>
+        <record_name>Notes List</record_name>
+        <reverted_from/>
+        <source>de4635cc87efd11030c34046cebb3523</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-11-29 13:39:31</sys_created_on>
+        <sys_id>4d6fe4dc8723111030c34046cebb35f7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>184c39d384b0000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-11-29 13:39:31</sys_updated_on>
+        <type>サービスポータルウィジェット</type>
+        <update_guid>856fe4dc5f231110c0edda32db438df7</update_guid>
+        <update_guid_history>856fe4dc5f231110c0edda32db438df7:-1175064252,0ff6f108f72315105a4621dc4cc814aa:1116220252</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="bk_Notes List">5730b8108763111030c34046cebb35bc</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-11-29 13:43:13</sys_created_on>
+        <sys_db_object display_value="" name="sp_widget">sp_widget</sys_db_object>
+        <sys_id>97303550225845b08bb8fe94a091cd24</sys_id>
+        <sys_metadata>06948fa8db3133000613a08a4896194c</sys_metadata>
+        <sys_name>Notes List</sys_name>
+        <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
+        <sys_scope_delete display_value="">64daa03572704d49a928bf08a985d6f9</sys_scope_delete>
+        <sys_update_name>sp_widget_06948fa8db3133000613a08a4896194c</sys_update_name>
+        <sys_update_version display_value="sp_widget_06948fa8db3133000613a08a4896194c">4d6fe4dc8723111030c34046cebb35f7</sys_update_version>
+    </sys_metadata_delete>
+</record_update>
